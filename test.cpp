@@ -1,3 +1,9 @@
+enum Type{Monster,My_Hero,Op_Hero};
+//分別對應的(nearbase,threatfor)為 (1,1),(0,1),(0,0),(0,2),(1,2)
+enum Priority{Target_Me,Eventually_Reach_Me,Never_Reach_Base,Eventually_Reach_Op,Target_Op};
+void swap(int &a,int &b){int temp=a;a=b;b=temp;}
+
+
 class entity
 {
     friend void player::each_round_read();
@@ -39,7 +45,8 @@ class player{
 
     public:
         void each_round_read();
-        const int my_hero_get();
+        int get_round() const {return round;}
+        void sort_mos(const int* priority);
         // 輸出指令
         const void MOVE(const int x, const int y);
         const void WAIT();
@@ -89,6 +96,7 @@ class player{
         void set_base_hp_mp();    
         base_loc set_base_loc();
         entity input_entity();
+        int round=0;
         void set_mos_dis(){mos[i].Set_all_dis(this)};
 
 }
@@ -97,6 +105,30 @@ void player::set_base_hp_mp(){
     scanf("%d %d %d %d",&my_hp,&my_mp,&op_hp,&op_mp);
     return;
 }
+
+void player::each_round_read(){
+    set_base_hp_mp();
+    int entity_count=0;
+    scanf("%d",entity_count);
+    int mos_count=0,my_hero_count=0,op_hero_count=0;
+    for(int i=0;i<entity_count;++i){
+        entity e;
+        e=each_round_read();
+        switch (e.type){
+            case Monster:
+                mos[mos_count].set
+                break;
+            case My_Hero:
+                mh[my_hero_count].set
+                break;
+            case Op_Hero:
+                op[op_hero_count].set
+                break;
+        }
+    }
+    
+}
+
 
 base_loc player::set_base_loc(){
     base_loc base;
