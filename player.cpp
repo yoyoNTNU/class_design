@@ -341,9 +341,101 @@ int player::get_op_hero_dis(const int i,const char target[]) const{
     return -1;
 }
 
+void player::sec_sort(const int sec_priority,const int start,const int end){
+    int temp=start;
+    switch(sec_priority){
+        case First_Far:
+            for(int i=start;i<end;++i){
+                for(int j=i+1;j<end;++j){
+                    if(mos[i].get_dis("my_base")<mos[j].get_dis("my_base")){
+                        swap_mos(mos[i],mos[j]);
+                    }
+                }
+            }
+            break;
+        case First_Near:
+            for(int i=start;i<end;++i){
+                for(int j=i+1;j<end;++j){
+                    if(mos[i].get_dis("my_base")>mos[j].get_dis("my_base")){
+                        swap_mos(mos[i],mos[j]);
+                    }
+                }
+            }
+            break;
+        case FIRST_SHIELD_Far:
+            for(int i=start;i<end;++i){
+                if(mos[i].get_attr("shield_life")!=0){
+                    swap_mos(mos[i],mos[temp]);
+                    ++temp;
+                }
+            }
+            for(int i=start;i<temp;++i){
+                for(int j=i+1;j<temp;++j){
+                    if(mos[i].get_dis("my_base")<mos[j].get_dis("my_base")){
+                        swap_mos(mos[i],mos[j]);
+                    }
+                }
+            }
+            for(int i=temp;i<end;++i){
+                for(int j=i+1;j<end;++j){
+                    if(mos[i].get_dis("my_base")<mos[j].get_dis("my_base")){
+                        swap_mos(mos[i],mos[j]);
+                    }
+                }
+            }
+            break;
+        case FIRST_SHIELD_Near:
+            for(int i=start;i<end;++i){
+                if(mos[i].get_attr("shield_life")!=0){
+                    swap_mos(mos[i],mos[temp]);
+                    ++temp;
+                }
+            }
+            for(int i=start;i<temp;++i){
+                for(int j=i+1;j<temp;++j){
+                    if(mos[i].get_dis("my_base")>mos[j].get_dis("my_base")){
+                        swap_mos(mos[i],mos[j]);
+                    }
+                }
+            }
+            for(int i=temp;i<end;++i){
+                for(int j=i+1;j<end;++j){
+                    if(mos[i].get_dis("my_base")>mos[j].get_dis("my_base")){
+                        swap_mos(mos[i],mos[j]);
+                    }
+                }
+            }
+    }
+}
 
-void sort_mos(const int* prime_priority,const int sec_priority){
-    
+
+
+int player::prime_sort(const int cur_prime_priority,const int sec_priority,const int current){
+    int NB=0,TF=0;//儲存對應priority的nearbase and threatfor
+    switch(cur_prime_priority){
+        case Target_Me:             NB=1;TF=1;break;
+        case Eventually_Reach_Me:   NB=0;TF=1;break;
+        case Never_Reach_Base:      NB=0;TF=0;break;
+        case Eventually_Reach_Op:   NB=0;TF=2;break;
+        case Target_Op:             NB=1;TF=2;break;
+    }
+    int cc=current;
+    for(int i=current;i<visible_mos_count;++i){
+        if(mos[i].get_attr("near_base")==NB && mos[i].get_attr("threat_for")==TF){
+            swap_mos(mos[current],mos[i]);
+            ++cc;
+        }
+    }
+    sec_sort(sec_priority,current,cc);
+    return cc;
+
+}
+
+void player::sort_mos(const int* prime_priority,const int sec_priority){
+    int current=0;
+    for(int i=0;i<5;++i){
+        current=prime_sort(prime_priority[i],sec_priority,current);
+    }
 }
 
 
@@ -383,12 +475,5 @@ int player::subsort_dis_hero(int hero,int priority,int current){
     return current;
 
 }
+*/
 
-
-//優先度可自訂(輸入0~4的排列 共五個參數) dis(small->large)：0:(nearbase,threatfor)=(1,1),1:(0,1),2:(0,0),3:(0,2),4:(1,0)
-void player::sort_dis_hero(int hero,int priority_list[]){
-    int c=1;
-    for(int i=0;i<5;i++){
-        c=subsort_dis_hero(hero,priority_list[i],c);
-    }  
-}*/

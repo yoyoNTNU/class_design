@@ -9,10 +9,10 @@
 enum Entity_Type{Monster,My_Hero,Op_Hero};
 //分別對應的(nearbase,threatfor)為 (1,1),(0,1),(0,0),(0,2),(1,2)
 enum Sort_Priority_Prime{Target_Me,Eventually_Reach_Me,Never_Reach_Base,Eventually_Reach_Op,Target_Op};
-enum Sort_Priority_Secindary{First_Far,First_Near,FIRST_SHIELD};
+enum Sort_Priority_Secindary{First_Far,First_Near,FIRST_SHIELD_Far,FIRST_SHIELD_Near};
 
 enum Roaming_Type{Around_Me,Wild_Area,Around_Op};
-void swap(int &a,int &b){int temp=a;a=b;b=temp;}
+void swap_mos(monster &a, monster &b){monster temp=a;a=b;b=temp;}
 
 class base_loc{
     friend class player;
@@ -31,7 +31,7 @@ class player{
 
         //排序函式
         //prime為5個區域的排列順序
-        //sec可選各區域中 [遠到近] [近到遠] [有盾優先(默認近到遠)]
+        //sec可選各區域中 [遠到近] [近到遠] [有盾優先(遠到近)][有盾優先(近到遠)]
         void sort_mos(const int* prime_priority,const int sec_priority);
 
         //獲取各種回傳值
@@ -89,7 +89,8 @@ class player{
         entity input_entity();
         int round=0;
         void init_mh_oh_mos();
-
+        int prime_sort(const int cur_prime_priority,const int sec_priority,const int current);
+        void sec_sort  (const int sec_priority,const int start,const int end);
 };
 
 int player::declare_count=0;
