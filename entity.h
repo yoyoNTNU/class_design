@@ -9,7 +9,11 @@ class entity
     friend class player;
 
     public:
-    static const  char* const attr[11];
+
+    static constexpr int attr_num=11; 
+    static constexpr int hero_attr_num=6; 
+    static const  char* const attr[attr_num];
+    
     int get(const char attr_name[]) const;
     private:
         int id=0;
@@ -25,6 +29,6 @@ class entity
         int threat_for=0;
 };
 
-const char* const entity::attr[11]={"id","type","x","y","shield_life","is_controlled","health","vx","vy","near_base","threat_for"};
+const char* const entity::attr[attr_num]={"id","type","x","y","shield_life","is_controlled","health","vx","vy","near_base","threat_for"};
 
 #endif

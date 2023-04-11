@@ -2,10 +2,15 @@
 #ifndef OP_HERO_H
 #define OP_HERO_H
 
+class entity;
+class player;
+
 class op_hero{
     public:
-        int get(const char attr_name[]) const;
+        int  get_attr(const char attr_name[]) const;
+        int  get_dis (const char target[]) const;
         void set_entity(const entity e);
+        void set_all_dis(const player a);
     private:
         int id=0;
         int type=0;

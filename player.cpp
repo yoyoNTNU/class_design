@@ -11,7 +11,7 @@ base_loc player::set_base_loc(){
     }
     int heros_per_player=-1;
     scanf("%d %d %d",&base.my_base_x,&base.my_base_y,&heros_per_player);
-    declare_count+=1;
+    ++declare_count;
     base.op_base_x=abs(base.my_base_x-17630);
     base.op_base_y=abs(base.my_base_y-9000);
     return base;
@@ -22,11 +22,11 @@ void player::init_mh_oh_mos(){
     visible_op_count=0;
     target_my_base_mos_count=0;
     entity e;
-    for(int i=0;i<3;++i){
+    for(int i=0;i<hero_per_player;++i){
         mh[i].set_entity(e);
         oh[i].set_entity(e);
     }
-    for(int i=0;i<max_mos_count;i++){
+    for(int i=0;i<max_mos_count;++i){
         mos[i].set_entity(e);
     }
 }
@@ -44,7 +44,7 @@ entity player::input_entity(){
 
 
 void player::each_round_read(){
-    round+=1;
+    ++round;
     init_mh_oh_mos();
     set_base_hp_mp();
     int entity_count=0;
@@ -56,18 +56,18 @@ void player::each_round_read(){
         switch (e.type){
             case Monster:
                 mos[visible_mos_count].set_entity(e);
-                visible_mos_count+=1;
+                ++visible_mos_count;
                 if(e.near_base==1&&e.threat_for==1){
-                    target_my_base_mos_count+=1;
+                    ++target_my_base_mos_count;
                 }
                 break;
             case My_Hero:
                 mh[my_hero_count].set_entity(e);
-                my_hero_count+=1;
+                ++my_hero_count;
                 break;
             case Op_Hero:
                 oh[visible_op_count].set_entity(e);
-                visible_op_count+=1;
+                ++visible_op_count;
                 break;
         }
     }
@@ -127,59 +127,141 @@ void player::SHIELD(const int id) const {
 
 
 //debug message
-const void player::DEBUG(){
+void player::print_my_hero_info() const {
     ///// my hero ///////
-    fprintf(stderr,"==========================\nmy_hero:\n");
-    for(int i=0;i<6;++i){
-        fprintf(stderr,"%s\t",entity::attr[i]);
-    }
-    for(int i=0;i<3;++i){
-        fprintf(stderr,"dis_op_hero_%d\t",i);
-    }
-    for(int i=0;i<3;++i){
-        fprintf(stderr,"\n");
-        for(int j=0;j<6;++j){
-            fprintf(stderr,"%d\t",get_my_hero(i,entity::attr[j]));
+    fprintf(stderr,"==========================\nmy_hero:");
+    for(int i=0;i<entity::hero_attr_num;++i){
+        fprintf(stderr,"\n%s\t",entity::attr[i]);
+        if(i<4){
+                fprintf(stderr,"\t");
         }
-        for(int j=0;j<3;++j){
-            if(get)//這邊要寫getmy_hero的dis_op_hero 可添加my_hero 的get函式
+        for(int j=0;j<hero_per_player;++j){
+            fprintf(stderr,"%d\t",get_my_hero_attr(j,entity::attr[i]));
         }
     }
-    cerr << "id\t" << "x\t" << "y\t" << "shield_life\t" << "is_controlled\t" << "distance between enemy" << endl;
-    for(int i = 0;i<3;++i){
-        cerr << mh[i].Get_id() << "\t" << mh[i].Get_x() << "\t" << mh[i].Get_y() << "\t" << mh[i].Get_shield_life() << "\t" << mh[i].Get_is_controlled() << "\t";
-        for(int j = 0;dis_op_hero[j];++j){
-            cerr << dis_op_hero[j] << " / ";
+    fprintf(stderr,"\ndis_op_hero_1\t");
+    for(int i=0;i<hero_per_player;++i){
+        if(int temp=get_my_hero_dis(i,"op_hero_1");temp==-1){
+            fprintf(stderr,"invisible\t");
+        }
+        else{
+            fprintf(stderr,"%d\t",temp);
         }
     }
-    cerr << endl;
-    ///////// op hero ///////////
-    cerr << "==========================" << endl;
-    cerr << "op_hero:" << endl;
-    cerr << "id\t" << "x\t" << "y\t" << "shield_life\t" << "is_controlled\t" << endl;
-    for(int i = 0;(oh[i]);++i){
-        cerr << oh[i].Get_id() << "\t" << oh[i].Get_x() << "\t" << oh[i].Get_y() << "\t" << oh[i].Get_shield_life() << "\t" << oh[i].Get_is_controlled() << "\t" << endl;
-    }
-    ///////// monster ///////////
-    cerr << "==========================" << endl;
-    cerr << "monsters:" << endl;
-    cerr << "id\t" << "x\t" << "y\t" << "shield_life\t" << "is_controlled\t" << "health\t" << "vx\t" << "vy\t" << "near_base\t" << "threat_for\t" 
-    << "Distance(my_base)\t" << "Distance(op_base)\t" << "Distance(my_hero)\t\t" << "Distance(enemy)\t" << endl;
-    for(int i = 0;(mos[i]);++i){
-        cerr << mos[i].Get_id() << "\t" << mos[i].Get_x() << "\t" << mos[i].Get_y() << "\t" << mos[i].Get_shield_life() << "\t" << mos[i].Get_is_controlled() << "\t" 
-        << mos[i].Get_health() << "\t" << mos[i].Get_vx() << "\t" << mos[i].Get_vy() << "\t" << mos[i].Get_near_base() << "\t" << mos[i].Get_threat_for() << "\t" 
-        << mos[i].Get_dis_my_base << "\t" << mos[i].Get_dis_op_base << "\t";
-        for(int j = 0;j<3;j++){
-            cerr << mos[i].Get_dis_my_hero[j] << " / ";
+    fprintf(stderr,"\ndis_op_hero_2\t");
+    for(int i=0;i<hero_per_player;++i){
+        if(int temp=get_my_hero_dis(i,"op_hero_2");temp==-1){
+            fprintf(stderr,"invisible\t");
         }
-        cerr << "\t";
-        for(int j = 0;mos[i].Get_dis_op_hero[j];j++){
-            cerr << mos[i].Get_dis_op_hero[j] << " / ";
+        else{
+            fprintf(stderr,"%d\t",temp);
         }
     }
-    cerr << endl;
-
+    fprintf(stderr,"\ndis_op_hero_3\t");
+    for(int i=0;i<hero_per_player;++i){
+        if(int temp=get_my_hero_dis(i,"op_hero_3");temp==-1){
+            fprintf(stderr,"invisible\t");
+        }
+        else{
+            fprintf(stderr,"%d\t",temp);
+        }
+    }
+    fprintf(stderr,"\ndis_my_base\t");
+    for(int i=0;i<hero_per_player;++i){
+        fprintf(stderr,"%d\t",get_my_hero_dis(i,"my_base"));
+    }
+    fprintf(stderr,"\ndis_op_base\t");
+    for(int i=0;i<hero_per_player;++i){
+        fprintf(stderr,"%d\t",get_my_hero_dis(i,"op_base"));
+    }
+    fprintf(stderr,"\n==========================\n");
 }
+
+void player::print_op_hero_info() const {
+    ///// op hero ///////
+    fprintf(stderr,"\n==========================\nop_hero:");
+    for(int i=0;i<entity::hero_attr_num;++i){
+        fprintf(stderr,"\n%s\t",entity::attr[i]);
+        if(i<4){
+                fprintf(stderr,"\t");
+        }
+        for(int j=0;j<visible_op_count;++j){
+            fprintf(stderr,"%d\t",get_op_hero_attr(j,entity::attr[i]));
+        }
+    }
+    fprintf(stderr,"\ndis_my_base\t");
+    for(int i=0;i<visible_op_count;++i){
+        fprintf(stderr,"%d\t",get_my_hero_dis(i,"my_base"));
+    }
+    fprintf(stderr,"\ndis_op_base\t");
+    for(int i=0;i<visible_op_count;++i){
+        fprintf(stderr,"%d\t",get_my_hero_dis(i,"op_base"));
+    }
+    fprintf(stderr,"\n==========================\n");
+}
+
+void player::print_monster_info() const {
+    ///////// monster ///////////
+    fprintf(stderr,"\n==========================\nmonster:");
+    for(int i=0;i<entity::attr_num;++i){
+        fprintf(stderr,"\n%s\t",entity::attr[i]);
+        if(i<4||(i<=8&&i>=6)){
+                fprintf(stderr,"\t");
+        }
+        for(int j=0;j<visible_mos_count;++j){
+            fprintf(stderr,"%d\t",get_monster_attr(j,entity::attr[i]));
+        }
+    }
+    fprintf(stderr,"\ndis_my_hero_1\t");
+    for(int i=0;i<visible_mos_count;++i){
+        fprintf(stderr,"%d\t",get_monster_dis(i,"my_hero_1"));
+    }
+    fprintf(stderr,"\ndis_my_hero_2\t");
+    for(int i=0;i<visible_mos_count;++i){
+        fprintf(stderr,"%d\t",get_monster_dis(i,"my_hero_2"));
+    }
+    fprintf(stderr,"\ndis_my_hero_3\t");
+    for(int i=0;i<visible_mos_count;++i){
+        fprintf(stderr,"%d\t",get_monster_dis(i,"my_hero_3"));
+    }
+    fprintf(stderr,"\ndis_op_hero_1\t");
+    for(int i=0;i<visible_mos_count;++i){
+        if(int temp=get_monster_dis(i,"op_hero_1");temp==-1){
+            fprintf(stderr,"invisible\t");
+        }
+        else{
+            fprintf(stderr,"%d\t",temp);
+        }
+    }
+    fprintf(stderr,"\ndis_op_hero_2\t");
+    for(int i=0;i<visible_mos_count;++i){
+        if(int temp=get_monster_dis(i,"op_hero_2");temp==-1){
+            fprintf(stderr,"invisible\t");
+        }
+        else{
+            fprintf(stderr,"%d\t",temp);
+        }
+    }
+    fprintf(stderr,"\ndis_op_hero_3\t");
+    for(int i=0;i<visible_mos_count;++i){
+        if(int temp=get_monster_dis(i,"op_hero_3");temp==-1){
+            fprintf(stderr,"invisible\t");
+        }
+        else{
+            fprintf(stderr,"%d\t",temp);
+        }
+    }
+    fprintf(stderr,"\ndis_my_base\t");
+    for(int i=0;i<visible_mos_count;++i){
+        fprintf(stderr,"%d\t",get_monster_dis(i,"my_base"));
+    }
+    fprintf(stderr,"\ndis_op_base\t");
+    for(int i=0;i<visible_mos_count;++i){
+        fprintf(stderr,"%d\t",get_monster_dis(i,"op_base"));
+    }
+    fprintf(stderr,"\n==========================\n");
+}
+
 
 //獲取資訊: my_hero
 bool my_hero_checkInput (const int input){
@@ -193,9 +275,16 @@ bool my_hero_checkInput (const int input){
             
 }
 
-int player::get_my_hero(const int i,const char attr_name[]) const{
+int player::get_my_hero_attr(const int i,const char attr_name[]) const{
     if(my_hero_checkInput(i)){
-        return mh[i].get(attr_name);
+        return mh[i].get_attr(attr_name);
+    }
+    return -1;
+}
+
+int player::get_my_hero_dis(const int i,const char target[]) const{
+    if(my_hero_checkInput(i)){
+        return mh[i].get_dis(target);
     }
     return -1;
 }
@@ -213,9 +302,16 @@ bool monster_checkInput (const int input,const int visible_mos_count){
     }
 }
 
-int player::get_monster(const int i,const char attr_name[]) const{
+int player::get_monster_attr(const int i,const char attr_name[]) const{
     if(monster_checkInput(i,visible_mos_count)){
-        return mos[i].get(attr_name);
+        return mos[i].get_attr(attr_name);
+    }
+    return -1;
+}
+
+int player::get_monster_dis(const int i,const char target[]) const{
+    if(monster_checkInput(i,visible_mos_count)){
+        return mos[i].get_dis(target);
     }
     return -1;
 }
@@ -231,9 +327,68 @@ bool op_hero_checkInput (const int input,const int visible_op_count){
     }
 }
 
-int player::get_op_hero(const int i,const char attr_name[]) const{
+int player::get_op_hero_attr(const int i,const char attr_name[]) const{
     if(op_hero_checkInput(i,visible_op_count)){
-        return oh[i].get(attr_name);
+        return oh[i].get_attr(attr_name);
     }
     return -1;
 }
+
+int player::get_op_hero_dis(const int i,const char target[]) const{
+    if(op_hero_checkInput(i,visible_op_count)){
+        return oh[i].get_dis(target);
+    }
+    return -1;
+}
+
+
+void sort_mos(const int* prime_priority,const int sec_priority){
+    
+}
+
+
+/*
+//增加小組中 是否需要有防護罩優先  0:不需要考慮  1:有盾優先  2:無盾優先
+//小組中排序 若上述為 0 則 0:距離短到長 1:距離長到短 
+//若有盾優先 則會在有盾的小組中 按距離排 沒盾的小組中 按距離排(有0或1可選)
+//若無盾優先 則會在沒盾的小組中 按距離排 有盾的小組中 按距離排(有0或1可選)
+int player::subsort_dis_hero(int hero,int priority,int current){
+    int NB,TF;//儲存對應priority的nearbase and threatfor
+    switch(priority){
+        case 0: NB=1;TF=1;break;
+        case 1: NB=0;TF=1;break;
+        case 2: NB=0;TF=0;break;
+        case 3: NB=0;TF=2;break;
+        case 4: NB=1;TF=2;break;
+    }
+    int cc=current;
+    for(int i=current;i<=mos_count;i++){
+        if(dis_hero[hero][i][7]==NB && dis_hero[hero][i][8]==TF){
+            for(int j=0;j<11;j++){
+                swap(dis_hero[hero][current][j],dis_hero[hero][i][j]);
+            }
+            current++;
+        }
+    }
+    for(int i=cc;i<current;i++){
+        for(int j=i+1;j<current;j++){
+            if(dis_hero[hero][j][9]<dis_hero[hero][i][9]){
+                for(int k=0;k<11;k++){
+                    swap(dis_hero[hero][i][k],dis_hero[hero][j][k]);
+                     //fprintf(stderr,"q=%d k=%d he_q=%d he_k=%d\n",c,j,dis_hero[i][q][m],dis_hero[i][k][m]);
+                }
+            }
+        }
+    }
+    return current;
+
+}
+
+
+//優先度可自訂(輸入0~4的排列 共五個參數) dis(small->large)：0:(nearbase,threatfor)=(1,1),1:(0,1),2:(0,0),3:(0,2),4:(1,0)
+void player::sort_dis_hero(int hero,int priority_list[]){
+    int c=1;
+    for(int i=0;i<5;i++){
+        c=subsort_dis_hero(hero,priority_list[i],c);
+    }  
+}*/
