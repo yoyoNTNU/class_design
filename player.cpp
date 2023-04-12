@@ -48,7 +48,7 @@ void player::each_round_read(){
     init_mh_oh_mos();
     set_base_hp_mp();
     int entity_count=0;
-    scanf("%d",entity_count);
+    scanf("%d",&entity_count);
     int my_hero_count=0;
     for(int i=0;i<entity_count;++i){
         entity e;
@@ -70,6 +70,15 @@ void player::each_round_read(){
                 ++visible_op_count;
                 break;
         }
+    }
+    for(int i=0;i<my_hero_count;++i){
+        mh[i].set_all_dis(*this);
+    }
+    for(int i=0;i<visible_op_count;++i){
+        oh[i].set_all_dis(*this);
+    }
+    for(int i=0;i<visible_mos_count;++i){
+        mos[i].set_all_dis(*this);
     }
 }
 
@@ -104,9 +113,8 @@ void player::ROAMING(int type) const {
             x=abs(base.op_base_x-x);
             y=abs(base.op_base_y-y);
             break;
-
-        printf("MOVE %d %d\n",x,y);
     }
+    printf("MOVE %d %d\n",x,y);
 }
 void player::WAIT() const {
     printf("WAIT\n");
@@ -143,6 +151,7 @@ void player::print_my_hero_info() const {
     for(int i=0;i<hero_per_player;++i){
         if(int temp=get_my_hero_dis(i,"op_hero_1");temp==-1){
             fprintf(stderr,"invisible\t");
+            break;
         }
         else{
             fprintf(stderr,"%d\t",temp);
@@ -152,6 +161,7 @@ void player::print_my_hero_info() const {
     for(int i=0;i<hero_per_player;++i){
         if(int temp=get_my_hero_dis(i,"op_hero_2");temp==-1){
             fprintf(stderr,"invisible\t");
+            break;
         }
         else{
             fprintf(stderr,"%d\t",temp);
@@ -161,6 +171,7 @@ void player::print_my_hero_info() const {
     for(int i=0;i<hero_per_player;++i){
         if(int temp=get_my_hero_dis(i,"op_hero_3");temp==-1){
             fprintf(stderr,"invisible\t");
+            break;
         }
         else{
             fprintf(stderr,"%d\t",temp);
@@ -191,11 +202,11 @@ void player::print_op_hero_info() const {
     }
     fprintf(stderr,"\ndis_my_base\t");
     for(int i=0;i<visible_op_count;++i){
-        fprintf(stderr,"%d\t",get_my_hero_dis(i,"my_base"));
+        fprintf(stderr,"%d\t",get_op_hero_dis(i,"my_base"));
     }
     fprintf(stderr,"\ndis_op_base\t");
     for(int i=0;i<visible_op_count;++i){
-        fprintf(stderr,"%d\t",get_my_hero_dis(i,"op_base"));
+        fprintf(stderr,"%d\t",get_op_hero_dis(i,"op_base"));
     }
     fprintf(stderr,"\n==========================\n");
 }
@@ -205,7 +216,7 @@ void player::print_monster_info() const {
     fprintf(stderr,"\n==========================\nmonster:");
     for(int i=0;i<entity::attr_num;++i){
         fprintf(stderr,"\n%s\t",entity::attr[i]);
-        if(i<4||(i<=8&&i>=6)){
+        if(i<4||(i<=8&&i>6)){
                 fprintf(stderr,"\t");
         }
         for(int j=0;j<visible_mos_count;++j){
@@ -228,6 +239,7 @@ void player::print_monster_info() const {
     for(int i=0;i<visible_mos_count;++i){
         if(int temp=get_monster_dis(i,"op_hero_1");temp==-1){
             fprintf(stderr,"invisible\t");
+            break;
         }
         else{
             fprintf(stderr,"%d\t",temp);
@@ -237,6 +249,7 @@ void player::print_monster_info() const {
     for(int i=0;i<visible_mos_count;++i){
         if(int temp=get_monster_dis(i,"op_hero_2");temp==-1){
             fprintf(stderr,"invisible\t");
+            break;
         }
         else{
             fprintf(stderr,"%d\t",temp);
@@ -246,6 +259,7 @@ void player::print_monster_info() const {
     for(int i=0;i<visible_mos_count;++i){
         if(int temp=get_monster_dis(i,"op_hero_3");temp==-1){
             fprintf(stderr,"invisible\t");
+            break;
         }
         else{
             fprintf(stderr,"%d\t",temp);

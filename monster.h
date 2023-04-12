@@ -28,8 +28,6 @@ class monster{
         int dis_my_base=0;
         int dis_op_base=0;
         void set(const char attr_name[],int val);
-        
-
 };
 
 #endif
