@@ -152,6 +152,7 @@ class player{
         int get_my_mp() const {return my_mp;}
         int get_op_hp() const {return op_hp;}
         int get_op_mp() const {return op_mp;}
+        int get_nearest_monster_to(const int i) const;
 
         // 輸出指令
         void MOVE(const int x, const int y) const ;//移動到x,y
@@ -849,6 +850,32 @@ void player::sort_mos(const int* prime_priority,const int sec_priority){
         current=prime_sort(prime_priority[i],sec_priority,current);
     }
 }
+
+//default 為和英雄1的距離
+int player::get_nearest_monster_to(const int i)const{
+    char target[10]={};
+    switch(i){
+        case 2:
+            strcpy(target,"my_hero_2");
+            break;
+        case 3:
+            strcpy(target,"my_hero_3");
+            break;
+        default:
+            strcpy(target,"my_hero_1");
+            break;
+    }
+    int min=30000,min_id=0;
+    for(int j=0;j<visible_mos_count;++j){
+        if(int temp=mos[j].get_dis(target);temp<min){
+            min=temp;
+            min_id=j;
+        }
+    }
+    return min_id;
+}
+
+
 
 int main()
 {

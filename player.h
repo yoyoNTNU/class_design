@@ -53,6 +53,7 @@ class player{
         int get_my_mp() const {return my_mp;}
         int get_op_hp() const {return op_hp;}
         int get_op_mp() const {return op_mp;}
+        int get_nearest_monster_to(const int i) const;
 
         // 輸出指令
         void MOVE(const int x, const int y) const ;//移動到x,y

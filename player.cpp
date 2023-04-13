@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
+#include <string.h>
 #include "player.h"
 
 base_loc player::set_base_loc(){
@@ -452,42 +453,27 @@ void player::sort_mos(const int* prime_priority,const int sec_priority){
     }
 }
 
-
-/*
-//增加小組中 是否需要有防護罩優先  0:不需要考慮  1:有盾優先  2:無盾優先
-//小組中排序 若上述為 0 則 0:距離短到長 1:距離長到短 
-//若有盾優先 則會在有盾的小組中 按距離排 沒盾的小組中 按距離排(有0或1可選)
-//若無盾優先 則會在沒盾的小組中 按距離排 有盾的小組中 按距離排(有0或1可選)
-int player::subsort_dis_hero(int hero,int priority,int current){
-    int NB,TF;//儲存對應priority的nearbase and threatfor
-    switch(priority){
-        case 0: NB=1;TF=1;break;
-        case 1: NB=0;TF=1;break;
-        case 2: NB=0;TF=0;break;
-        case 3: NB=0;TF=2;break;
-        case 4: NB=1;TF=2;break;
+//default 為和英雄1的距離
+int player::get_nearest_monster_to(const int i)const{
+    char target[10]={};
+    switch(i){
+        case 2:
+            strcpy(target,"my_hero_2");
+            break;
+        case 3:
+            strcpy(target,"my_hero_3");
+            break;
+        default:
+            strcpy(target,"my_hero_1");
+            break;
     }
-    int cc=current;
-    for(int i=current;i<=mos_count;i++){
-        if(dis_hero[hero][i][7]==NB && dis_hero[hero][i][8]==TF){
-            for(int j=0;j<11;j++){
-                swap(dis_hero[hero][current][j],dis_hero[hero][i][j]);
-            }
-            current++;
+    int min=30000,min_id=0;
+    for(int j=0;j<visible_mos_count;++j){
+        if(int temp=mos[j].get_dis(target);temp<min){
+            min=temp;
+            min_id=j;
         }
     }
-    for(int i=cc;i<current;i++){
-        for(int j=i+1;j<current;j++){
-            if(dis_hero[hero][j][9]<dis_hero[hero][i][9]){
-                for(int k=0;k<11;k++){
-                    swap(dis_hero[hero][i][k],dis_hero[hero][j][k]);
-                     //fprintf(stderr,"q=%d k=%d he_q=%d he_k=%d\n",c,j,dis_hero[i][q][m],dis_hero[i][k][m]);
-                }
-            }
-        }
-    }
-    return current;
-
+    return min_id;
 }
-*/
 
